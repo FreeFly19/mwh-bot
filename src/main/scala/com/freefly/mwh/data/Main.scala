@@ -1,5 +1,6 @@
+package com.freefly.mwh.data
+
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.functions._
 
 object Main {
   private val spark: SparkSession = SparkSession.builder()
