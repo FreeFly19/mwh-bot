@@ -1,11 +1,12 @@
 package com.freefly.mwh.bot
 
-case class RollResult(number: Int, win: Map[BidCell, Int])
+case class RollResult(number: Int, winBids: Seq[BidCell], lostBids: Seq[BidCell])
 case class RouletteBid(amount: Int, bidCell: BidCell)
 
 trait BidCell {
   val rate: Int
   def isWin(n: Int): Boolean
+  def winAmount(bidAmount: Int): Int = bidAmount * rate
 }
 
 case class Number(n: Int) extends BidCell {
@@ -41,12 +42,17 @@ case object NineteenToThirtySix extends BidCell {
 
 class AmericanRoulette(numberSupplier: RouletteNumberSupplier) extends Roulette[Seq[RouletteBid], RollResult] {
   def roll(bids: Seq[RouletteBid]): RollResult = {
-    val i = numberSupplier.next()
-    if (i < -1 || i > 36) throw new IllegalStateException("Generated number cannot be less than -1(\"00\") or more than 36")
-    RollResult(i, Map())
+    val i = numberSupplier.getNext()
+    RollResult(i, Nil, Nil)
   }
 }
 
 trait RouletteNumberSupplier {
-  def next(): Int
+  protected def next(): Int
+
+  final def getNext(): Int = {
+    val r = next()
+    if (r < -1 || r > 36) throw new IllegalStateException("Generated number cannot be less than -1(\"00\") or more than 36")
+    r
+  }
 }
